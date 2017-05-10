@@ -1,0 +1,13 @@
+{
+  "name": "freemarker-loader",
+  "version": "0.1.0",
+  "description": "Process data with Apache Freemarker templates",
+  "main": "index.js",
+  "repository": "git@github.com:aixigo/freemarker-loader.git",
+  "author": "Jonas Pommerening <jonas.pommerening@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "java": "^0.8.0",
+    "loader-utils": "^1.1.0"
+  }
+}

@@ -1,5 +1,11 @@
-const java = require( 'java' );
+/**
+ * Copyright 2017 aixigo AG
+ * Released under the MIT license.
+ * https://opensource.org/licenses/MIT
+ */
+
 const path = require( 'path' );
+const java = require( 'java' );
 const loaderUtils = require( 'loader-utils' );
 const utils = require( './lib/utils' );
 

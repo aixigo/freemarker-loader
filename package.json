@@ -6,8 +6,16 @@
   "repository": "git@github.com:aixigo/freemarker-loader.git",
   "author": "Jonas Pommerening <jonas.pommerening@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "pretest": "test -f test/freemarker.jar || curl -o test/freemarker.jar https://search.maven.org/remotecontent?filepath=org/freemarker/freemarker/2.3.26-incubating/freemarker-2.3.26-incubating.jar",
+    "test": "mocha"
+  },
   "dependencies": {
     "java": "^0.8.0",
     "loader-utils": "^1.1.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.3.0"
   }
 }

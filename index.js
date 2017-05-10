@@ -28,7 +28,7 @@ const TEMPLATE_LOADER = 'freemarker.cache.TemplateLoader';
 module.exports = function (code) {
    const options = loaderUtils.getOptions( this );
    const template = options.template || 'index.html';
-   const classpath = options.classpath || [ 'target/dependency' ];
+   const classpath = Array.isArray( options.classpath ) ? options.classpath : [ options.classpath ];
    const format = options.format || path.extname( template ).substr( 1 );
    const encoding = options.encoding || 'UTF-8';
    const locale = options.locale;
@@ -36,9 +36,15 @@ module.exports = function (code) {
    this.cacheable();
    this.async();
 
-   java.registerClient( () => {
-      classpath.forEach( cp => { java.classpath.pushDir( cp ) } );
-   } );
+   if( !java.isJvmCreated() ) {
+      java.registerClient( () => {
+         classpath.forEach( cp => {
+            if( cp ) {
+               java.classpath.push( path.resolve( this.context, cp ) );
+            }
+         } );
+      } );
+   }
 
    java.ensureJvm( () => {
       const fmconfig = java.newInstanceSync( CONFIGURATION );
@@ -61,8 +67,7 @@ module.exports = function (code) {
       utils.pipe( [
          ( callback ) => fmconfig.getTemplate( template, callback ),
          ( fmtemplate, callback ) => fmtemplate.process( fmdata, fmwriter, callback ),
-         ( callback ) => fmwriter.toString( callback ),
-         ( str, callback ) => callback( null, 'module.exports = ' + JSON.stringify( str ) + ';' )
+         ( callback ) => fmwriter.toString( callback )
       ], this.callback );
    } );
 };

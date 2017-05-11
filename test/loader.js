@@ -7,60 +7,42 @@
 'use strict';
 
 const fs = require( 'fs' );
+const path = require( 'path' );
 const expect = require( 'chai' ).expect;
 const loader = require( '..' );
 
 describe( 'freemarker-loader', () => {
 
-   it('should process templates', done => {
-      callLoader({
-         query: '?template=index.html&classpath=freemarker.jar',
-         inputValue: { test: 123 },
-         callback( err, result ) {
-            if( err ) {
-               done( err );
-               return;
-            }
+   it( 'runs in the pitching phase', done => {
+      pitchLoader( {
+         query: '?data=data.js&classpath=freemarker.jar',
+      }, __dirname + '/index.html', done );
+   } );
 
-            expect( result ).to.equal( '<em>123</em>\n' );
-            done();
-         }
-      });
-   });
-
-   it('should declare dependencies', done => {
-      let dependencies = [];
-      callLoader({
-         query: '?template=index.html&classpath=freemarker.jar',
-         inputValue: { test: 123 },
-         addDependency( dep ) {
-            dependencies.push( dep );
-         },
-         callback( err, result ) {
-            if( err ) {
-               done( err );
-               return;
-            }
-
-            expect( dependencies ).to.eql( [
-               'index_en_US.html',
-               'index_en.html',
-               'index.html'
-            ].map( file => __dirname + '/' + file ) );
-            done();
-         }
-      });
-   });
-
-   function callLoader( options, source ) {
-      loader.call( Object.assign({
+   function pitchLoader( options, request, done ) {
+      loader.pitch.call( Object.assign( {
          context: __dirname,
-         resourcePath: __dirname + '/test.json',
+         resourcePath: request.split( '!' ).pop(),
          fs,
          cacheable() {},
          async() {},
-         addDependency() {}
-      }, options), source );
+         addDependency() {},
+         loadModule( request, callback ) {
+            const filename = path.resolve( this.context, request );
+            fs.readFile( filename, callback );
+         },
+         exec( source ) {
+            const fn = new Function( 'module', 'exports', 'module.exports = ' + JSON.stringify(source.toString()) + ';' );
+            const module = {
+               exports: {}
+            };
+            fn( module, module.exports );
+            return module.exports;
+         },
+         callback( err, source ) {
+            done( err );
+         }
+      }, options ), request, '', {} );
    }
 
 });

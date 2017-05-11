@@ -11,16 +11,14 @@ const java = require( 'java' );
 const loaderUtils = require( 'loader-utils' );
 const utils = require( './lib/utils' );
 
-const STRING_READER = 'java.io.StringReader';
 const STRING_WRITER = 'java.io.StringWriter';
-const TEMPLATE = 'freemarker.template.Template';
 
 module.exports = function () {
    throw new Error( 'This is a pitching loader…' );
 };
 
 module.exports.pitch = function (remainingRequest) {
-   const options = loaderUtils.getOptions( this );
+   const options = loaderUtils.getOptions( this ) || {};
    const classpath = Array.isArray( options.classpath ) ? options.classpath : [ options.classpath ];
 
    const resourceLoaders = remainingRequest.split( '!' );
@@ -60,7 +58,7 @@ module.exports.pitch = function (remainingRequest) {
       }
 
 
-      utils.pipe( [
+      pipe( [
          ( callback ) => {
             fmconfig.getTemplate( path.relative( this.context, this.resourcePath ), callback );
          },
@@ -82,5 +80,24 @@ module.exports.pitch = function (remainingRequest) {
          },
       ], this.callback );
    } );
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function pipe( fns, callback ) {
+   const stack = fns.slice();
+
+   iterate( null );
+
+   function iterate( err ) {
+      const fn = stack.shift();
+
+      if( err || !fn ) {
+         callback.apply( null, arguments );
+      }
+      else {
+         fn.apply( null, Array.prototype.slice.call( arguments, 1, fn.length ).concat( [ iterate ] ) );
+      }
+   }
 };
 

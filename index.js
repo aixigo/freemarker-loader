@@ -4,6 +4,8 @@
  * https://opensource.org/licenses/MIT
  */
 
+'use strict';
+
 const path = require( 'path' );
 const java = require( 'java' );
 const loaderUtils = require( 'loader-utils' );
@@ -44,14 +46,13 @@ module.exports.pitch = function (remainingRequest) {
    }
 
    java.ensureJvm( () => {
-      'use strict';
+      let fmwriter;
       let fmconfig;
-      let templateName;
-      let templateSourceName;
-      let templateSource;
+      let fmtemplate;
 
       try {
-         fmconfig = utils.getFreemarkerConfig( this, options );
+         fmwriter = java.newInstanceSync( STRING_WRITER );
+         fmconfig = utils.getFreemarkerConfig( this, options, resourceLoaders );
       }
       catch( err ) {
          this.callback( err );
@@ -63,28 +64,22 @@ module.exports.pitch = function (remainingRequest) {
          ( callback ) => {
             fmconfig.getTemplate( path.relative( this.context, this.resourcePath ), callback );
          },
-         ( fmtemplate, callback ) => {
-            templateName = fmtemplate.getNameSync();
-            templateSourceName = fmtemplate.getSourceNameSync();
-
-            const resourcePath = path.join( this.context, templateSourceName );
-            const resolvedRequest = resourceLoaders.concat( [ resourcePath ] ).join( '!' );
-            this.loadModule( resolvedRequest, callback );
-         },
-         ( source, callback ) => {
-            templateSource = this.exec( source, this.resourcePath );
+         ( template, callback ) => {
+            fmtemplate = template;
             this.loadModule( data, callback );
          },
          ( source, callback ) => {
-            const fmdata = utils.toJava( this.exec( source, data ) );
-            const fmreader = java.newInstanceSync( STRING_READER, templateSource );
-            const fmwriter = java.newInstanceSync( STRING_WRITER );
-            const fmtemplate = java.newInstanceSync( TEMPLATE, templateName, templateSourceName, fmreader, fmconfig );
-
-            fmtemplate.process( fmdata, fmwriter, () => {
-               fmwriter.toString( callback );
-            } );
-         }
+            try {
+               const fmdata = utils.toJava( this.exec( source, data ) );
+               fmtemplate.process( fmdata, fmwriter, callback );
+            }
+            catch( err ) {
+               callback( err );
+            }
+         },
+         ( callback ) => {
+            fmwriter.toString( callback );
+         },
       ], this.callback );
    } );
 };

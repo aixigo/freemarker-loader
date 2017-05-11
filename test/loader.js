@@ -32,7 +32,7 @@ describe( 'freemarker-loader', () => {
             fs.readFile( filename, callback );
          },
          exec( source ) {
-            const fn = new Function( 'module', 'exports', 'module.exports = ' + JSON.stringify(source.toString()) + ';' );
+            const fn = new Function( 'module', 'exports', source );
             const module = {
                exports: {}
             };

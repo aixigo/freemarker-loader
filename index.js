@@ -68,7 +68,7 @@ module.exports.pitch = function (remainingRequest) {
          },
          ( source, callback ) => {
             try {
-               const fmdata = utils.toJava( this.exec( source, data ) );
+               const fmdata = utils.getModel( this.exec( source, data ) );
                fmtemplate.process( fmdata, fmwriter, callback );
             }
             catch( err ) {

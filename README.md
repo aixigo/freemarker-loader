@@ -23,20 +23,9 @@ Since Freemarker is part of the Java ecosystem, it is made for Java types, not s
 supports complex objects that follow Bean conventions, so you can use `${name}` to interpolate the result of
 calling the method `getName()` of the object. Freemarker also has dedicated features to format Date objects.
 
-To not lose all these features, the loader provides a simple mapping of JavaScript types to Java types that
+To not lose all these features, the loader provides a simple mapping of JavaScript types to the Freemarker
+[`TemplateModel`](http://freemarker.org/docs/api/freemarker/template/TemplateModel.html) interfaces that
 extends the feature set of plain JSON.
-
-JavaScript objects will be converted to
-[`java.util.Map`](https://docs.oracle.com/javase/8/docs/api/java/util/Map.html) and array will be converted to
-[`java.util.List`](https://docs.oracle.com/javase/8/docs/api/java/util/List.html). In addition to the types
-supported by JSON, you can use `Date`, `RegExp` and functions with zero to two parameters.
-
-These will be converted to [`java.util.Date`](https://docs.oracle.com/javase/8/docs/api/java/util/Date.html),
-[`java.util.regex.Pattern`](https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html),
-[`java.util.function.Supplier`](https://docs.oracle.com/javase/8/docs/api/java/util/function/Supplier.html),
-[`java.util.function.Function`](https://docs.oracle.com/javase/8/docs/api/java/util/function/Function.html) and
-[`java.util.function.BiFunction`](https://docs.oracle.com/javase/8/docs/api/java/util/function/BiFunction.html)
-respectively.
 
 If you want to use a Java library to deserialize the data instead, feel free to file an issue!
 

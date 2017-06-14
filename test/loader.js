@@ -15,7 +15,7 @@ describe( 'freemarker-loader', () => {
 
    it( 'runs in the pitching phase', done => {
       pitchLoader( {
-         query: '?data=data.js&classpath=freemarker.jar',
+         query: '?data=data.js&classpath=freemarker.jar'
       }, __dirname + '/index.html', done );
    } );
 

@@ -1,1 +1,4 @@
-<em>123</em>
+<#if obj.yes><h1>Date: ${obj.now?datetime}</h1></#if>
+<dl><#list lst as item>
+  <dt><em>${item.str}</em>:</dt><dd>${item.num}</dd>
+</#list></dl>

@@ -1,6 +1,6 @@
 {
   "name": "freemarker-loader",
-  "version": "0.1.1",
+  "version": "0.2.0-rc.0",
   "description": "Process data with Apache Freemarker templates",
   "main": "index.js",
   "repository": "git@github.com:aixigo/freemarker-loader.git",

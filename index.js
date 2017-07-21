@@ -13,22 +13,11 @@ const utils = require( './lib/utils' );
 
 const STRING_WRITER = 'java.io.StringWriter';
 
-module.exports = function () {
-   throw new Error( 'This is a pitching loader…' );
-};
+module.exports = function( source ) {
 
-module.exports.pitch = function (remainingRequest) {
    const options = loaderUtils.getOptions( this ) || {};
    const classpath = Array.isArray( options.classpath ) ? options.classpath : [ options.classpath ];
-
-   const resourceLoaders = remainingRequest.split( '!' );
-
-   if( resourceLoaders.pop() !== this.resourcePath ) {
-      this.callback( new Error( 'Expected remaining request to end with resource path "' + this.resourcePath + '"' ) );
-      return;
-   }
-
-   const data = options.data;
+   const baseDirectory = this.options.context || process.cwd();
 
    this.cacheable();
    this.async();
@@ -44,40 +33,39 @@ module.exports.pitch = function (remainingRequest) {
    }
 
    java.ensureJvm( () => {
-      let fmwriter;
-      let fmconfig;
-      let fmtemplate;
+      let fmWriter;
+      let fmConfig;
 
       try {
-         fmwriter = java.newInstanceSync( STRING_WRITER );
-         fmconfig = utils.getFreemarkerConfig( this, options, resourceLoaders );
+         fmWriter = java.newInstanceSync( STRING_WRITER );
+         fmConfig = utils.getFreeMarkerConfig( this, options, baseDirectory );
       }
       catch( err ) {
          this.callback( err );
          return;
       }
 
-
       pipe( [
-         ( callback ) => {
-            fmconfig.getTemplate( path.relative( this.context, this.resourcePath ), callback );
+         callback => {
+            fmConfig.getTemplate( path.relative( baseDirectory, options.template ), callback );
          },
          ( template, callback ) => {
-            fmtemplate = template;
-            this.loadModule( data, callback );
-         },
-         ( source, callback ) => {
             try {
-               const fmdata = utils.getModel( this.exec( source, data ) );
-               fmtemplate.process( fmdata, fmwriter, callback );
+               const fmData = utils.getModel( this.exec( source, this.resourcePath ) );
+               template.process( fmData, fmWriter, callback );
             }
             catch( err ) {
                callback( err );
             }
          },
-         ( callback ) => {
-            fmwriter.toString( callback );
-         },
+         callback => {
+            // fmWriter.toString( callback );
+            fmWriter.toString( (err, str) => {
+               callback( err, str );
+               // this is probably where we want to write the processed template to a file for debugging
+               // console.log( str );
+            } );
+         }
       ], this.callback );
    } );
 };
@@ -99,5 +87,5 @@ function pipe( fns, callback ) {
          fn.apply( null, Array.prototype.slice.call( arguments, 1, fn.length ).concat( [ iterate ] ) );
       }
    }
-};
+}
 

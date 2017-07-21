@@ -2,6 +2,9 @@
 
 ## Last Changes
 
+- [#3](https://github.com/aixigo/freemarker-loader/issues/3): expect template model data as input, template as query parameter
+    + **BREAKING CHANGE:*** see ticket for details
+
 
 ## v0.2.0
 

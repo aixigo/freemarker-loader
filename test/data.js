@@ -10,7 +10,7 @@ module.exports = {
       num: 12
    } ],
    obj: {
-      now: new Date(),
+      now: new Date('1955-11-12 22:04:00-08'),
       yes: true
    }
 };

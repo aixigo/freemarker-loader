@@ -8,8 +8,8 @@
   "license": "MIT",
   "scripts": {
     "pretest": "test -f test/freemarker.jar || curl -o test/freemarker.jar https://search.maven.org/remotecontent?filepath=org/freemarker/freemarker/2.3.26-incubating/freemarker-2.3.26-incubating.jar",
-    "test": "npm run lint && mocha",
-    "lint": "eslint index.js lib/"
+    "test": "mocha",
+    "posttest": "eslint index.js lib/ test/"
   },
   "dependencies": {
     "loader-utils": "^1.1.0"

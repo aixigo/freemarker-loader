@@ -14,20 +14,16 @@ module.exports = function( reportData ) {
 
    const options = loaderUtils.getOptions( this ) || {};
    const classpath = Array.isArray( options.classpath ) ? options.classpath : [ options.classpath ];
-   const templateFile = options.template;
-   options.templateRootDirectory = path.resolve( this.context, '..' );
-   this.addDependency( templateFile );
+   const baseDirectory = this.options.context || process.cwd();
 
    this.cacheable();
    this.async();
 
    if( !java.isJvmCreated() ) {
       java.registerClient( () => {
-         classpath.forEach( cp => {
-            if( cp ) {
-               java.classpath.push( path.resolve( this.context, cp ) );
-            }
-         } );
+         java.classpath.push(
+            ...classpath.filter( cp => !!cp ).map( cp => path.resolve( this.context, cp ) )
+         );
       } );
    }
 
@@ -37,7 +33,7 @@ module.exports = function( reportData ) {
 
       try {
          fmWriter = java.newInstanceSync( STRING_WRITER );
-         fmConfig = utils.getFreeMarkerConfig( this, options );
+         fmConfig = utils.getFreeMarkerConfig( this, options, baseDirectory );
       }
       catch( err ) {
          this.callback( err );
@@ -46,7 +42,7 @@ module.exports = function( reportData ) {
 
       pipe( [
          callback => {
-            fmConfig.getTemplate( path.relative( options.templateRootDirectory, templateFile ), callback );
+            fmConfig.getTemplate( path.relative( baseDirectory, options.template ), callback );
          },
          ( template, callback ) => {
             try {

@@ -59,12 +59,7 @@ module.exports = function( source ) {
             }
          },
          callback => {
-            // fmWriter.toString( callback );
-            fmWriter.toString( (err, str) => {
-               callback( err, str );
-               // this is probably where we want to write the processed template to a file for debugging
-               // console.log( str );
-            } );
+            fmWriter.toString( callback );
          }
       ], this.callback );
    } );

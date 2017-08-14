@@ -1,6 +1,6 @@
 # freemarker-loader
 
-> Use Apache [Freemarker](http://freemarker.org) to render templates with data
+> Render data to strings with Apache [Freemarker](http://freemarker.org)
 
 The _`freemarker-loader`_ processes an input template with Apache Freemarker and configurable data to
 generate a (raw) string that can then be further processed with [webpack](https://webpack.js.org).
@@ -10,10 +10,7 @@ generate a (raw) string that can then be further processed with [webpack](https:
 
 ```js
 // Import data from data.json and render it with template.html
-import html from 'html-loader!freemarker-loader?data=data.json!./template.html';
-
-// Use another loader for loading template.html and all it's <#include>s
-import html from 'html-loader!freemarker-loader?data=data.json!another-loader!./template.html';
+import html from 'html-loader!freemarker-loader?template=template.html!./data.json';
 ```
 
 
@@ -33,10 +30,9 @@ If you want to use a Java library to deserialize the data instead, feel free to 
 ## Formats
 
 Freemarker supports more output formats than just HTML. By default, the loader tries to infer the format from
-the extension of the template resource. For example, if you load `index.html`, the loader assumes you want to
-use the `html` output format. If you want a different output format, you can override that decision with the
-`?format` option. This can be especially useful, if you use a custom loader to pre-process the templates.
-The following formats are available:
+the extension of the template. For example, if you load `index.html`, the loader assumes you want to use the
+`html` output format. If you want a different output format, you can override that decision with the `?format`
+option. The following formats are available:
 
 - [`css`](http://freemarker.org/docs/api/freemarker/core/CSSOutputFormat.html): CSSOutputFormat
 - [`html`](http://freemarker.org/docs/api/freemarker/core/HTMLOutputFormat.html): HTMLOutputFormat
@@ -59,7 +55,7 @@ Example:
 
 ```js
 // will first try index_fr_BE.html, then index_fr.html and finally index.html
-import html from 'html-loader!freemarker-loader?data=data.json&locale=fr-BE!./index.html';
+import html from 'html-loader!freemarker-loader?template=index.html&locale=fr-BE!./data.json';
 ```
 
 

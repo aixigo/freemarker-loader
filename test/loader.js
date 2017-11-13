@@ -23,7 +23,7 @@ describe( 'freemarker-loader', () => {
             }
 
             expect( dropEmptyLines( source ) ).to.equal( [
-               '<h1>Date: Nov 12, 1955 10:04:00 PM</h1>',
+               '<h1>Date: 1955-11-13T06:04:00Z</h1>',
                '<dl>',
                '   <dt><em>twelve</em>:</dt><dd>12</dd>',
                '   <dt><em>fourty three</em>:</dt><dd>43</dd>',

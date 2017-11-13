@@ -33,11 +33,9 @@ module.exports = function( source ) {
    }
 
    java.ensureJvm( () => {
-      let fmWriter;
       let fmConfig;
 
       try {
-         fmWriter = java.newInstanceSync( STRING_WRITER );
          fmConfig = utils.getFreeMarkerConfig( this, options, baseDirectory );
       }
       catch( err ) {
@@ -45,42 +43,35 @@ module.exports = function( source ) {
          return;
       }
 
-      pipe( [
-         callback => {
-            fmConfig.getTemplate( path.relative( baseDirectory, options.template ), callback );
-         },
-         ( template, callback ) => {
+      fmConfig.getTemplate( path.relative( baseDirectory, options.template ), ( err, template ) => {
+         invokeBlocking( callback => {
             try {
-               const fmData = utils.getModel( this.exec( source, this.resourcePath ) );
-               template.process( fmData, fmWriter, callback );
+               const untransformedModel = this.exec( source, this.resourcePath );
+               const fmData = utils.getModel( untransformedModel );
+               const fmWriter = java.newInstanceSync( STRING_WRITER );
+               template.process( fmData, fmWriter, () => {
+                  callback( null, fmWriter.toStringSync() );
+               } );
             }
             catch( err ) {
                callback( err );
             }
-         },
-         callback => {
-            fmWriter.toString( callback );
-         }
-      ], this.callback );
+         }, this.callback );
+      } );
    } );
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-function pipe( fns, callback ) {
-   const stack = fns.slice();
-
-   iterate( null );
-
-   function iterate( err ) {
-      const fn = stack.shift();
-
-      if( err || !fn ) {
-         callback.apply( null, arguments );
-      }
-      else {
-         fn.apply( null, Array.prototype.slice.call( arguments, 1, fn.length ).concat( [ iterate ] ) );
-      }
-   }
+let nextPromise = Promise.resolve();
+function invokeBlocking( job, callback ) {
+   const previousNext = nextPromise;
+   nextPromise = new Promise( resolve => {
+      previousNext.then( () => {
+         job( ( ...args ) => {
+            callback( ...args );
+            resolve();
+         } );
+      } );
+   } );
 }
-

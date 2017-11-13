@@ -2,6 +2,8 @@
 
 ## Last Changes
 
+- [#5](https://github.com/aixigo/freemarker-loader/issues/5): fixed possible multithreading issue
+
 
 ## v0.3.0
 

@@ -18,6 +18,7 @@ module.exports = function( source ) {
    const options = loaderUtils.getOptions( this ) || {};
    const classpath = Array.isArray( options.classpath ) ? options.classpath : [ options.classpath ];
    const baseDirectory = this.options.context || process.cwd();
+   const template = loaderUtils.interpolateName( this, options.template, { content: source } );
 
    this.cacheable();
    this.async();
@@ -43,7 +44,7 @@ module.exports = function( source ) {
          return;
       }
 
-      fmConfig.getTemplate( path.relative( baseDirectory, options.template ), ( err, template ) => {
+      fmConfig.getTemplate( path.relative( baseDirectory, template ), ( err, template ) => {
          invokeBlocking( callback => {
             try {
                const untransformedModel = this.exec( source, this.resourcePath );

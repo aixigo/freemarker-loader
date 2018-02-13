@@ -15,7 +15,7 @@ describe( 'freemarker-loader', () => {
 
    it( 'runs', done => {
       runLoader( {
-         query: '?template=' + __dirname + '/index.html&classpath=freemarker.jar',
+         query: '?template=[path]index.html&classpath=freemarker.jar',
          callback( err, source ) {
             if( err ) {
                done( err );

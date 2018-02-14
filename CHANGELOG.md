@@ -2,6 +2,7 @@
 
 ## Last Changes
 
+- [#4](https://github.com/aixigo/freemarker-loader/issues/4): treat `null` and `undefined` as Java `null`
 - [#6](https://github.com/aixigo/freemarker-loader/issues/6): handle placeholders in template parameter
 
 

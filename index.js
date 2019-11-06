@@ -17,7 +17,9 @@ module.exports = function( source ) {
 
    const options = loaderUtils.getOptions( this ) || {};
    const classpath = Array.isArray( options.classpath ) ? options.classpath : [ options.classpath ];
-   const baseDirectory = this.options.context || process.cwd();
+   const baseDirectory = options.context
+     ? options.context
+     : ( this.options.context || process.cwd());
    const template = loaderUtils.interpolateName( this, options.template, { content: source } );
 
    this.cacheable();
